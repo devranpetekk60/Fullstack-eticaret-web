@@ -1,0 +1,100 @@
+@using Models
+@using System.Diagnostics.Eventing.Reader
+@model List<Product>
+        <div class="container py-5 h-100">
+        <div class="row g-4">
+        @foreach (Product product in Model)
+        {
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="card hover-card h-100 shadow-sm border-0">
+
+                    <div class="position-relative overflow-hidden rounded-4">
+
+                        
+                        <img src="@(product.ProductImage != null 
+                                    ? product.ProductImage.Url 
+                                    : "/images/no-image.png")"
+                             class="card-img-top"
+                             alt="@product.ProductName"
+                             style="height:220px; object-fit:cover; transition:transform .3s ease;" />
+                        
+
+                        <span class="price-badge bg-success position-absolute top-0 start-0 m-2 px-3 py-2">
+                            @product.Price.ToString("C")
+                        </span>
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-center text-truncate">
+                            @product.ProductName
+                        </h5>
+
+                        <p class="card-text text-muted small text-center flex-grow-1"
+                           title="@product.Description">
+                            @(string.IsNullOrEmpty(product.Description)
+                                ? ""
+                                : product.Description.Length > 80
+                                    ? product.Description.Substring(0, 80) + "..."
+                                    : product.Description)
+                        </p>
+
+                        <div class="mt-3 d-flex justify-content-between">
+                            <a asp-controller="Home"
+                               asp-action="Details"
+                               asp-route-id="@product.id"
+                               class="btn btn-outline-primary btn-sm px-3">
+                                Detay
+                            </a>
+
+                           
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+        }
+        </div>
+        </div>
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 1rem !important;
+        overflow: hidden;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.18);
+    }
+
+    .hover-card:hover img {
+        transform: scale(1.07);
+    }
+
+    .price-badge {
+        font-weight: bold;
+        border-radius: 0.6rem;
+        font-size: 0.95rem;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    }
+
+    .btn-success {
+        transition: all .3s ease;
+        background-color: #25D366;
+        border: none;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        background-color: #1ebe57;
+    }
+
+    .btn-outline-primary {
+        transition: all .3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        transform: translateY(-2px);
+    }
+</style>

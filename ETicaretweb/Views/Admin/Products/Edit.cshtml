@@ -1,0 +1,94 @@
+@model Models.Product
+@{
+    ViewData["Title"] = "Ürün Düzenle";
+    Layout = "_AdminLayout";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Ürün Düzenle</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="EditProduct" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="ProductName" class="form-label">Ürün Adı *</label>
+                <input asp-for="ProductName" class="form-control" required />
+                <span asp-validation-for="ProductName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Price" class="form-label">Fiyat *</label>
+                <input asp-for="Price" class="form-control" type="number" required />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CategoryId" class="form-label">Kategori *</label>
+                <select asp-for="CategoryId" class="form-select" required>
+                    <option value="">Kategori Seçin</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.id">@category.CategoryName</option>
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="URL" class="form-label">URL</label>
+                <input asp-for="URL" class="form-control" />
+                <span asp-validation-for="URL" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Açıklama</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="productImage" class="form-label">Yeni Ürün Resmi Ekle (Opsiyonel)</label>
+                <input type="file" name="productImage" id="productImage" class="form-control" accept="image/*" onchange="previewImage(this, 'productPreview')" />
+                <small class="form-text text-muted">Yeni resim yüklerseniz mevcut resimlerin yanına eklenecektir.</small>
+                <div class="mt-2">
+                    <img id="productPreview" src="#" alt="Önizleme" style="max-width: 200px; max-height: 200px; display: none;" class="img-thumbnail" />
+                </div>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="isActive" class="form-check-input" type="checkbox" />
+                <label asp-for="isActive" class="form-check-label">Aktif</label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Güncelle
+                </button>
+                <a asp-action="Products" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> İptal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
+

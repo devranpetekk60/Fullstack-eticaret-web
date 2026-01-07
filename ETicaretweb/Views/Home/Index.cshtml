@@ -1,0 +1,176 @@
+﻿@using Models
+@model List<Category>
+
+@{
+    ViewData["Title"] = "Kategoriler";
+}
+
+<div class="category-page">
+
+    <!-- BAŞLIK -->
+    <div class="page-header text-center">
+        <h1 class="page-title">Kategoriler</h1>
+        <p class="page-subtitle">
+            Aradığınız ürünleri kategorilere göre keşfedin
+        </p>
+    </div>
+
+    <!-- KARTLAR -->
+    <div class="container">
+        <div class="row g-4">
+            @foreach (var kategori in Model)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="category-card">
+
+                        <div class="image-wrapper">
+                            <img src="@Url.Content($"~/images/categories/{kategori.ImageUrl}")"
+                                 alt="@kategori.CategoryName" />
+
+                            <div class="gradient-overlay"></div>
+
+                            <div class="category-title">
+                                @kategori.CategoryName
+                            </div>
+                        </div>
+
+                        <div class="card-footer-custom">
+                            <a asp-controller="Home"
+                               asp-action="Category"
+                               asp-route-id="@kategori.id"
+                               class="btn explore-btn">
+                                Ürünleri Keşfet
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+<style>
+/* === SAYFA ARKAPLAN === */
+.category-page {
+    min-height: 100vh;
+    padding: 80px 0;
+    background:
+        radial-gradient(circle at top left, #eef2ff, transparent 40%),
+        radial-gradient(circle at bottom right, #fce7f3, transparent 45%),
+        linear-gradient(135deg, #f8fafc, #eef2ff);
+}
+
+/* === HEADER === */
+.page-header {
+    margin-bottom: 60px;
+}
+
+.page-title {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #4A6CF7, #9333EA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+
+.page-subtitle {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+/* === KART === */
+.category-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    transition: all 0.35s ease;
+    height: 100%;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+}
+
+/* === RESİM === */
+.image-wrapper {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.category-card:hover img {
+    transform: scale(1.1);
+}
+
+/* === OVERLAY === */
+.gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.7),
+        rgba(0,0,0,0.1)
+    );
+}
+
+/* === KATEGORİ ADI === */
+.category-title {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    right: 18px;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    z-index: 2;
+}
+
+/* === FOOTER === */
+.card-footer-custom {
+    padding: 18px;
+    background: #fff;
+}
+
+/* === BUTON === */
+.explore-btn {
+    width: 100%;
+    border-radius: 999px;
+    padding: 12px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #4A6CF7, #6C8CFF);
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.explore-btn i {
+    transition: transform 0.3s ease;
+}
+
+.explore-btn:hover {
+    background: linear-gradient(90deg, #3a57d1, #4A6CF7);
+    transform: translateY(-2px);
+}
+
+.explore-btn:hover i {
+    transform: translateX(5px);
+}
+</style>

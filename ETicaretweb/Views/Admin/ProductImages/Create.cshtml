@@ -1,0 +1,63 @@
+@model Models.ProductImage
+@{
+    ViewData["Title"] = "Yeni Ürün Resmi Ekle";
+    Layout = "_AdminLayout";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Yeni Ürün Resmi Ekle</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="CreateProductImage" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label for="ProductId" class="form-label">Ürün *</label>
+                <select name="ProductId" id="ProductId" class="form-select" required>
+                    <option value="">Ürün Seçin</option>
+                    @foreach (var product in ViewBag.Products)
+                    {
+                        <option value="@product.id">@product.ProductName</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="imageFile" class="form-label">Resim Dosyası *</label>
+                <input type="file" name="imageFile" id="imageFile" class="form-control" accept="image/*" required onchange="previewImage(this, 'imagePreview')" />
+                <small class="form-text text-muted">JPG, PNG veya GIF formatında resim yükleyebilirsiniz.</small>
+                <div class="mt-2">
+                    <img id="imagePreview" src="#" alt="Önizleme" style="max-width: 200px; max-height: 200px; display: none;" class="img-thumbnail" />
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Kaydet
+                </button>
+                <a asp-action="ProductImages" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> İptal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
+

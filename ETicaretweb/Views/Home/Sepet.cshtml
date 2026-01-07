@@ -1,0 +1,195 @@
+@{
+    ViewData["Title"] = "Sepet";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4">🛒 Sepetim</h2>
+
+    <div id="cartArea"></div>
+
+    <div class="mt-4">
+        <button class="btn btn-success w-100" onclick="sendCartToWhatsApp()">
+            <i class="bi bi-whatsapp"></i> Sepeti WhatsApp ile Gönder
+        </button>
+    </div>
+</div>
+
+<style>
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.cart-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.cart-info {
+    flex: 1;
+}
+
+.qty-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.qty-btn {
+    border: none;
+    background-color: #f0f0f0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.qty-btn:hover {
+    background-color: #ddd;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #dc3545;
+    cursor: pointer;
+}
+
+.total-box {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 15px;
+}
+</style>
+
+<script>
+function getCart() {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function saveCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+/* ➕ artır */
+function increaseQty(id) {
+    let cart = getCart();
+    let item = cart.find(p => p.id === id);
+    if (item) {
+        item.quantity++;
+        saveCart(cart);
+        renderCart();
+    }
+}
+
+/* ➖ azalt */
+function decreaseQty(id) {
+    let cart = getCart();
+    let item = cart.find(p => p.id === id);
+
+    if (item) {
+        item.quantity--;
+        if (item.quantity <= 0) {
+            cart = cart.filter(p => p.id !== id);
+        }
+        saveCart(cart);
+        renderCart();
+    }
+}
+
+function removeFromCart(id) {
+    let cart = getCart().filter(p => p.id !== id);
+    saveCart(cart);
+    renderCart();
+}
+
+function renderCart() {
+    let cart = getCart();
+    let area = document.getElementById("cartArea");
+    area.innerHTML = "";
+
+    if (cart.length === 0) {
+        area.innerHTML = "<p class='text-muted'>Sepetiniz boş</p>";
+        return;
+    }
+
+    let total = 0;
+
+    cart.forEach(p => {
+        let lineTotal = p.price * p.quantity;
+        total += lineTotal;
+
+        area.innerHTML += `
+            <div class="cart-item">
+                <img src="${p.image}" class="cart-image" />
+
+                <div class="cart-info">
+                    <strong>${p.name}</strong>
+                    <div>${p.price} ₺</div>
+
+                    <div class="qty-box">
+                        <button class="qty-btn" onclick="decreaseQty(${p.id})">−</button>
+                        <span>${p.quantity}</span>
+                        <button class="qty-btn" onclick="increaseQty(${p.id})">+</button>
+                    </div>
+
+                    <small>Ara Toplam: ${lineTotal} ₺</small>
+                </div>
+
+                <button class="remove-btn" onclick="removeFromCart(${p.id})">🗑️</button>
+            </div>
+        `;
+    });
+
+    area.innerHTML += `
+        <div class="total-box">
+            Toplam: ${total} ₺
+        </div>
+    `;
+}
+
+function sendCartToWhatsApp() {
+    let cart = getCart();
+
+    if (!cart || cart.length === 0) {
+        alert("Sepetiniz boş");
+        return;
+    }
+
+    let lines = [];
+    let total = 0;
+
+    lines.push("🛒 Sipariş Detayları");
+    lines.push("");
+
+    cart.forEach(p => {
+        let lineTotal = p.price * p.quantity;
+        total += lineTotal;
+        lines.push(`- ${p.name} (${p.quantity} adet) : ${lineTotal} ₺`);
+    });
+
+    lines.push("");
+    lines.push(`Toplam: ${total} ₺`);
+
+    const message = lines.join("\n");
+    const phone = "905349613360";
+
+    window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+        "_blank"
+    );
+}
+
+document.addEventListener("DOMContentLoaded", renderCart);
+</script>

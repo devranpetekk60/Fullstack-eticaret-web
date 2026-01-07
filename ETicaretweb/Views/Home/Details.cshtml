@@ -1,0 +1,196 @@
+@using Models
+@model Product
+
+@{
+    ViewBag.Title = Model.ProductName;
+}
+
+<div class="container my-5">
+    <div class="row g-4">
+
+        <!-- ÜRÜN RESMİ -->
+        <div class="col-md-6 text-center">
+            <div class="position-relative">
+                <img src="@(Model.ProductImage?.Url ?? "/images/no-image.png")"
+                     class="img-fluid rounded shadow"
+                     style="max-height:450px; object-fit:cover;"
+                     alt="@Model.ProductName" />
+
+                <span class="badge bg-success position-absolute top-0 start-0 m-3 px-3 py-2">
+                    @Model.Price ₺
+                </span>
+            </div>
+        </div>
+
+        <!-- ÜRÜN BİLGİ -->
+        <div class="col-md-6 d-flex flex-column justify-content-center">
+            <h2 class="fw-bold mb-3">@Model.ProductName</h2>
+            <p class="text-muted mb-4">@Model.Description</p>
+
+            <div class="d-flex gap-3 mb-4">
+                <button class="btn btn-primary px-4" onclick="addToCart()">
+                    Sepete Ekle
+                </button>
+
+                <!-- ❗ WHATSAPP BUTONU (ARTIK RAZOR ENCODE YOK) -->
+                <button class="btn btn-success px-4" onclick="sendSingleProductToWhatsApp()">
+                    WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<!-- 🛒 SEPET -->
+<div class="container mb-5">
+    <h4 class="mb-3">🛒 Sepet</h4>
+    <div id="cartArea"></div>
+
+    <button class="btn btn-success w-100 mt-3" onclick="sendCartToWhatsApp()">
+        <i class="bi bi-whatsapp"></i> Sepeti WhatsApp ile Gönder
+    </button>
+</div>
+
+<style>
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.cart-image {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.cart-info {
+    flex: 1;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #dc3545;
+    cursor: pointer;
+}
+</style>
+
+<script>
+/* ---------------- CART ---------------- */
+
+function getCart() {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function saveCart(cart) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function addToCart() {
+    const product = {
+        id: @Model.id,
+        name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProductName)),
+        price: Number(@Model.Price),
+        image: "@(Model.ProductImage?.Url ?? "/images/no-image.png")",
+        quantity: 1
+    };
+
+    let cart = getCart();
+    let existing = cart.find(p => p.id === product.id);
+
+    if (existing) {
+        existing.quantity++;
+    } else {
+        cart.push(product);
+    }
+
+    saveCart(cart);
+    renderCart();
+    alert("Ürün sepete eklendi ✅");
+}
+
+function removeFromCart(id) {
+    let cart = getCart().filter(p => p.id !== id);
+    saveCart(cart);
+    renderCart();
+}
+
+function renderCart() {
+    let cart = getCart();
+    let area = document.getElementById("cartArea");
+    area.innerHTML = "";
+
+    if (cart.length === 0) {
+        area.innerHTML = "<p class='text-muted'>Sepet boş</p>";
+        return;
+    }
+
+    cart.forEach(p => {
+        area.innerHTML += `
+            <div class="cart-item">
+                <img src="${p.image}" class="cart-image" />
+                <div class="cart-info">
+                    <strong>${p.name}</strong><br/>
+                    ${p.quantity} x ${p.price} ₺
+                </div>
+                <button class="remove-btn" onclick="removeFromCart(${p.id})">🗑️</button>
+            </div>
+        `;
+    });
+}
+
+/* ---------------- WHATSAPP ---------------- */
+
+// TEK ÜRÜN
+function sendSingleProductToWhatsApp() {
+    const phone = "905349613360";
+    const productName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProductName));
+
+    const message = `Merhaba, ${productName} ürünüyle ilgileniyorum.`;
+    window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+        "_blank"
+    );
+}
+
+// SEPET
+function sendCartToWhatsApp() {
+    let cart = getCart();
+    if (cart.length === 0) {
+        alert("Sepet boş");
+        return;
+    }
+
+    let lines = [];
+    let total = 0;
+
+    lines.push("🛒 Sipariş Detayları");
+    lines.push("");
+
+    cart.forEach(p => {
+        const lineTotal = p.price * p.quantity;
+        total += lineTotal;
+        lines.push(`- ${p.name} (${p.quantity} adet) : ${lineTotal} ₺`);
+    });
+
+    lines.push("");
+    lines.push(`Toplam: ${total} ₺`);
+
+    const phone = "905349613360";
+    window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(lines.join("\n"))}`,
+        "_blank"
+    );
+}
+
+document.addEventListener("DOMContentLoaded", renderCart);
+</script>

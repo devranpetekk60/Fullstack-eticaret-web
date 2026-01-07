@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ETicaret</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    
+
+    
+    <header>
+        <nav class="navbar navbar-expand-lg custom-navbar">
+
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Devran</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Anasayfa</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Contact">İletişim</a></li>
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="Dashboard"><i class="bi bi-shield-check"></i> Admin Panel</a></li>
+                            <li class="nav-item">
+                                <form asp-controller="Home" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link btn btn-link text-light border-0 p-0" style="background: none;">
+                                        <i class="bi bi-box-arrow-right"></i> Çıkış
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="/Home/Sepet">
+                                <i class="bi bi-bag fs-5"></i>
+                                <span id="cart-count"
+                                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                      style="font-size: .7rem;">
+                                    0
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Ürün Arama Formu -->
+                    <form class="d-flex" asp-controller="Home" asp-action="Search" method="get" onsubmit="return kontrolEt()">
+                        <input id="searchBox" class="form-control me-2" type="search" name="products" placeholder="Ürün ara..." />
+                        <button class="btn btn-outline-light" type="submit">Ara</button>
+                    </form>
+
+                    <script>
+                        function kontrolEt() {
+                            const val = document.getElementById("searchBox").value.trim();
+                            if (val === "") {
+                                alert("Lütfen aramak istediğiniz ürünü yazın!");
+                                return false;
+                            }
+                            return true;
+                        }
+                    </script>
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="content py-3 mt-3 flex-grow-1">
+        @RenderBody()
+    </div>
+
+   <footer class="custom-footer text-center py-3">
+    <small>&copy; 2025 - ETicaret</small>
+</footer>
+
+
+    
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateCartCount() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            document.getElementById("cart-count").innerText = cart.length;
+        }
+        updateCartCount();
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

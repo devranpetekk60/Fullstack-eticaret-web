@@ -1,0 +1,64 @@
+@model Models.Category
+@{
+    ViewData["Title"] = "Yeni Kategori Ekle";
+    Layout = "_AdminLayout";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Yeni Kategori Ekle</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="CreateCategory" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="CategoryName" class="form-label">Kategori Adı *</label>
+                <input asp-for="CategoryName" class="form-control" required />
+                <span asp-validation-for="CategoryName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="URL" class="form-label">URL</label>
+                <input asp-for="URL" class="form-control" />
+                <span asp-validation-for="URL" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="categoryImage" class="form-label">Kategori Resmi</label>
+                <input type="file" name="categoryImage" id="categoryImage" class="form-control" accept="image/*" onchange="previewImage(this, 'categoryPreview')" />
+                <small class="form-text text-muted">JPG, PNG veya GIF formatında resim yükleyebilirsiniz.</small>
+                <div class="mt-2">
+                    <img id="categoryPreview" src="#" alt="Önizleme" style="max-width: 200px; max-height: 200px; display: none;" class="img-thumbnail" />
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Kaydet
+                </button>
+                <a asp-action="Categories" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> İptal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
+
