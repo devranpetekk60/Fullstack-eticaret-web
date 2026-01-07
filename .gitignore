@@ -11,3 +11,7 @@ appsettings.json
 *.sqlite
 
 wwwroot/images/uploads/
+# SQLite runtime files
+*.db-shm
+*.db-wal
+*.db
